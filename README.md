@@ -30,7 +30,7 @@ Here's how our system works in practice:
 ## 4. Prototype Demonstration
 For Round 1, we focused on solving the biggest problem first: **how do you reliably collect and store the complex folklore data an AI needs to learn?** Our prototype is a fully-working pipeline for this.
 
-[![Watch our FolkloreGPT Demo]((https://youtu.be/iPR_BBNPLVk?si=QC-1Swm3dj9A6BWQ))]
+[![Watch our FolkloreGPT Demo]([https://youtu.be/iPR_BBNPLVk?si=QC-1Swm3dj9A6BWQ](https://youtu.be/iPR_BBNPLVk?si=QC-1Swm3dj9A6BWQ))]
 
 ## 5. Our Plan for Round 2: Building the "GPT" Part
 Our big goal for the next round is to plug the AI storytelling engine into the data platform we just built. Here’s our concrete, step-by-step plan:
