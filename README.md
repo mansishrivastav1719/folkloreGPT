@@ -16,21 +16,10 @@ For **Round 1**, we focused on **Phase 1: Building "FolkloreBase"** – a robust
 
 The core logic of our prototype is a dual-backend architecture that separates data ingestion from AI processing, ensuring scalability and clean data flow for model training.
 
-```mermaid
-flowchart TD
-    A[User Interface<br>React Frontend] --> B[API Gateway]
-    B --> C[Data Ingestion Server<br>Node.js + Express]
-    B --> D[Core API Server<br>Python + FastAPI]
-    C --> E[(Metadata Storage<br>MongoDB)]
-    C --> F[(Media Storage<br>Cloudinary)]
-    D --> E
-    
-    subgraph Current_Round1_Logic["Round 1 Core Logic: Data Pipeline"]
-        C -- "1. Upload Story & Media" --> F
-        C -- "2. Save Cultural Metadata" --> E
-    end
+![System Architecture Diagram](dataflow.png)
+*Diagram showing user interaction with frontend, dual backend servers, and data storage systems*
 
-```markdown
+
 ## Flow Explanation:
 Here's how our system works in practice:
 1. **The React Frontend** is where users interact with everything. It's built with a component library we set up, and it handles forms for stories and media uploads.
@@ -41,12 +30,10 @@ Here's how our system works in practice:
 ## 4. Prototype Demonstration
 For Round 1, we focused on solving the biggest problem first: **how do you reliably collect and store the complex folklore data an AI needs to learn?** Our prototype is a fully-working pipeline for this.
 
-[![Watch our FolkloreGPT Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://youtu.be/YOUR_VIDEO_ID)
-
-*Replace `YOUR_VIDEO_ID` with your actual YouTube video ID*
+[![Watch our FolkloreGPT Demo]((https://youtu.be/iPR_BBNPLVk?si=QC-1Swm3dj9A6BWQ))]
 
 ## 5. Our Plan for Round 2: Building the "GPT" Part
-Our big goal for the next round is to plug the AI storytelling engine into the solid data platform we just built. Here’s our concrete, step-by-step plan:
+Our big goal for the next round is to plug the AI storytelling engine into the data platform we just built. Here’s our concrete, step-by-step plan:
 
 ### Phase 1: Integrate the Core AI Model
 - **Add AI Libraries:** First, we'll add the necessary `transformers` and `torch` libraries to our `backend/requirements.txt` file.
