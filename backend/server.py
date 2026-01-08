@@ -58,6 +58,34 @@ async def get_status_checks():
     status_checks = await db.status_checks.find().to_list(1000)
     return [StatusCheck(**status_check) for status_check in status_checks]
 
+#  AI STORY GENERATION ENDPOINT 
+class StoryRequest(BaseModel):
+    prompt: str
+    max_length: int = 100
+
+@api_router.post("/generate", response_model=dict)
+async def generate_story(request: StoryRequest):
+    """
+    Core AI prototype endpoint.
+    For now, returns a mock story based on prompt keywords.
+    """
+    # SIMPLE MOCK LOGIC 
+    story_library = {
+        "mountain": "Long ago, the mountains were ancient giants who slept. They whispered secrets to the wind, which carried tales to the valleys below.",
+        "river": "The river's journey began as a single tear from the sky. It learned songs from every stone and creature it passed, becoming a flowing story.",
+        "forest": "The wise forest remembers every footstep. Its trees are libraries, their leaves holding stories that rustle in the dark.",
+        "animal": "In the old tales, animals could speak in human tongue, sharing wisdom from a time when the world was still being dreamed.",
+    }
+    
+    # Find matching story or return default
+    prompt_lower = request.prompt.lower()
+    for keyword, story in story_library.items():
+        if keyword in prompt_lower:
+            return {"generated_story": story}
+    
+    # Default response if no keyword matches
+    return {"generated_story": "In the beginning, the elders spoke of a time when stories grew on trees and laughter was a currency more valuable than gold."}
+    
 # Include the router in the main app
 app.include_router(api_router)
 
