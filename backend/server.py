@@ -19,6 +19,12 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+# Initialize AI story generator (placeholder for now) 
+story_generator = pipeline('text-generation', model='distilgpt2', device=-1) 
+
+# Placeholder AI Story Generator (To be enhanced in next branch)
+story_generator = pipeline('text-generation', model='gpt2', device=-1)  # device=-1 uses CPU
+
 # Create the main app without a prefix
 app = FastAPI()
 
