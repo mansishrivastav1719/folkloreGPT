@@ -19,7 +19,8 @@ import Submit from "./pages/Submit";
 import About from "./pages/About";
 import Settings from "./pages/Settings";
 import Contact from "./pages/Contact";
-import StoryGenerator from "./pages/StoryGenerator"; //
+
+import StoryGenerator from "./pages/StoryGenerator";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -58,7 +59,7 @@ function App() {
                   <Route path="/about" element={<About />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/contact" element={<Contact />} />
-                  <Route path="/ai-storyteller" element={<StoryGenerator />} />
+                  <Route path="/ai-storyteller" element={<StoryGenerator />} /> 
                 </Routes>
               </main>
               <Footer />
