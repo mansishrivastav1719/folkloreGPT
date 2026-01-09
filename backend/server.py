@@ -66,8 +66,8 @@ except Exception as e:
 # Create the main app without a prefix
 app = FastAPI()
 
-# Create a router
-api_router = APIRouter()
+# Create a router WITH /api PREFIX - FIXED LINE
+api_router = APIRouter(prefix="/api")  # 🔧 FIXED: Added prefix="/api"
 
 
 # Define Models
@@ -186,7 +186,7 @@ async def generate_story(request: StoryRequest):
             
             return {
                 "generated_story": "In the beginning, the elders spoke of a time when stories grew on trees and laughter was a currency more valuable than gold.",
-                "ai_model_used": False,
+                "ai_model_loaded": False,
                 "note": "Using default mock story (AI model not loaded)"
             }
             
