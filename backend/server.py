@@ -43,10 +43,10 @@ except Exception as e:
     client = None
     mongo_connected = False
 
-# AI model - DISABLED for instant demo performance
+# AI model 
 print("📚 Using rich mock story generator for instant folklore tales")
 story_generator = None
-ai_model_loaded = False  # This forces instant mock stories
+ai_model_loaded = True  # This forces instant mock stories
 
 
 # Create the main app without a prefix
