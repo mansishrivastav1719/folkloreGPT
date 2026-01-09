@@ -35,6 +35,8 @@ const Header = () => {
     { name: 'Share Story', href: '/submit', icon: Mic },
     { name: 'About', href: '/about', icon: Heart },
     { name: 'Contact', href: '/contact', icon: Settings },
+    // ADDED AI STORYTELLER LINK
+    { name: 'AI Storyteller', href: '/ai-storyteller', icon: Sparkles, badge: true },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -88,6 +90,12 @@ const Header = () => {
                     isActive(item.href) ? 'animate-pulse' : ''
                   }`} />
                   <span>{item.name}</span>
+                  {/* AI Badge */}
+                  {item.badge && (
+                    <Badge className="ml-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs border-0 px-1.5 py-0.5">
+                      AI
+                    </Badge>
+                  )}
                   {/* Active indicator */}
                   {isActive(item.href) && (
                     <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-amber-600 rounded-full animate-pulse"></div>
@@ -175,16 +183,32 @@ const Header = () => {
                       )}
                     </div>
                     <span>{item.name}</span>
+                    {/* AI Badge for mobile */}
+                    {item.badge && (
+                      <Badge className="ml-auto bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs border-0 px-2 py-0.5">
+                        AI
+                      </Badge>
+                    )}
                     {/* Sparkle effect on active */}
-                    {isActive(item.href) && (
+                    {isActive(item.href) && !item.badge && (
                       <Sparkles className="w-4 h-4 text-amber-600 animate-pulse ml-auto" />
                     )}
                   </Link>
                 );
               })}
               
-              {/* Mobile CTA */}
-              <div className="pt-3 border-t border-amber-200/50">
+              {/* Mobile CTA with AI Button */}
+              <div className="pt-3 border-t border-amber-200/50 space-y-2">
+                {/* AI Storyteller Button */}
+                <Link
+                  to="/ai-storyteller"
+                  className="flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Sparkles className="w-5 h-5 animate-pulse" />
+                  <span>✨ AI Storyteller</span>
+                </Link>
+                
                 <Link
                   to="/submit"
                   className="flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg"
