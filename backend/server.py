@@ -36,6 +36,8 @@ except Exception as e:
     class MockDB:
         def __getattr__(self, name):
             return MockCollection()
+        def get_collection(self, name):
+            return MockCollection()
     
     db = MockDB()
     client = None
@@ -82,24 +84,36 @@ async def health():
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Only try to insert if MongoDB is connected
-    if mongo_connected:
-        await db.status_checks.insert_one(status_obj.dict())
-    else:
-        print("Mock DB: Skipping insert (MongoDB not connected)")
-    
-    return status_obj
+    try:
+        status_dict = input.dict()
+        status_obj = StatusCheck(**status_dict)
+        
+        if mongo_connected:
+            collection = db.get_collection('status_checks')
+            await collection.insert_one(status_obj.dict())
+            print(f"✅ Status check saved for: {input.client_name}")
+        else:
+            print("ℹ️ Mock DB: Status check not saved (MongoDB not connected)")
+        
+        return status_obj
+    except Exception as e:
+        print(f"⚠️ Error creating status check: {e}")
+        # Return the object anyway (without saving to DB)
+        return StatusCheck(client_name=input.client_name)
 
 @api_router.get("/status", response_model=List[StatusCheck])
 async def get_status_checks():
-    if mongo_connected:
-        status_checks = await db.status_checks.find().to_list(1000)
-        return [StatusCheck(**status_check) for status_check in status_checks]
-    else:
-        print("Mock DB: Returning empty list (MongoDB not connected)")
+    try:
+        if mongo_connected:
+            collection = db.get_collection('status_checks')
+            status_checks = await collection.find().to_list(1000)
+            print(f"✅ Retrieved {len(status_checks)} status checks")
+            return [StatusCheck(**status_check) for status_check in status_checks]
+        else:
+            print("ℹ️ Mock DB: Returning empty list (MongoDB not connected)")
+            return []
+    except Exception as e:
+        print(f"⚠️ Error fetching status checks: {e}")
         return []
 
 #  AI STORY GENERATION ENDPOINT (MOCKED)
