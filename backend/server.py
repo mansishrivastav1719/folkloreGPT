@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 from typing import List
 import uuid
 from datetime import datetime
-from transformers import pipeline
+# REMOVED: from transformers import pipeline
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -41,13 +41,9 @@ except Exception as e:
     client = None
     mongo_connected = False
 
-# AI model WITH ERROR HANDLING
-try:
-    story_generator = pipeline('text-generation', model='distilgpt2', device='cpu')
-    print("✅ AI model loaded successfully")
-except Exception as e:
-    print(f"⚠️ AI model failed to load: {e}")
-    story_generator = None
+# AI model DISABLED - Using mock
+print("✅ AI: Using mock generator (transformers disabled for stability)")
+story_generator = None
 
 
 # Create the main app without a prefix
@@ -69,7 +65,20 @@ class StatusCheckCreate(BaseModel):
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World", "mongodb": mongo_connected, "ai_model": story_generator is not None}
+    return {"message": "Hello World", "mongodb": mongo_connected, "ai_model": False}
+
+@api_router.get("/test")
+async def test():
+    return {"status": "ok", "message": "App is running", "timestamp": datetime.utcnow().isoformat()}
+
+@api_router.get("/health")
+async def health():
+    return {
+        "status": "healthy",
+        "mongodb": mongo_connected,
+        "ai_model": False,
+        "timestamp": datetime.utcnow().isoformat()
+    }
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
@@ -93,33 +102,17 @@ async def get_status_checks():
         print("Mock DB: Returning empty list (MongoDB not connected)")
         return []
 
-#  AI STORY GENERATION ENDPOINT 
+#  AI STORY GENERATION ENDPOINT (MOCKED)
 class StoryRequest(BaseModel):
     prompt: str
     max_length: int = 100
 
 @api_router.post("/generate", response_model=dict)
 async def generate_story(request: StoryRequest):
-    """
-    Core AI prototype endpoint.
-    For now, returns a mock story based on prompt keywords.
-    """
-    # SIMPLE MOCK LOGIC 
-    story_library = {
-        "mountain": "Long ago, the mountains were ancient giants who slept. They whispered secrets to the wind, which carried tales to the valleys below.",
-        "river": "The river's journey began as a single tear from the sky. It learned songs from every stone and creature it passed, becoming a flowing story.",
-        "forest": "The wise forest remembers every footstep. Its trees are libraries, their leaves holding stories that rustle in the dark.",
-        "animal": "In the old tales, animals could speak in human tongue, sharing wisdom from a time when the world was still being dreamed.",
+    return {
+        "generated_story": f"Mock story for: '{request.prompt}'. The AI model is currently disabled for deployment stability.",
+        "note": "AI will be enabled after basic deployment is verified"
     }
-    
-    # Find matching story or return default
-    prompt_lower = request.prompt.lower()
-    for keyword, story in story_library.items():
-        if keyword in prompt_lower:
-            return {"generated_story": story}
-    
-    # Default response if no keyword matches
-    return {"generated_story": "In the beginning, the elders spoke of a time when stories grew on trees and laughter was a currency more valuable than gold."}
     
 # Include the router in the main app
 app.include_router(api_router)
