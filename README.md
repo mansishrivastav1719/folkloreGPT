@@ -68,7 +68,7 @@ Our big goal for the next round is to plug the AI storytelling engine into the d
 FolkloreGPT is deployed and fully functional with real AI story generation.
 
 ### **Backend API (Live)**
-- **URL:** `[https://folkloregpt-production.up.railway.app](https://folkloregpt-production.up.railway.app/api/)`
+- **URL:** `https://folkloregpt-production.up.railway.app/api/`
 - **Status:** ✅ **AI Model Enabled** (distilgpt2)
 - **Health Check:** `GET /api/` returns `{"message": "Hello World", "mongodb": true, "ai_model": true}`
 
