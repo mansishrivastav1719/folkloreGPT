@@ -29,7 +29,7 @@ story_generator = pipeline('text-generation', model='gpt2', device=-1)  # device
 app = FastAPI()
 
 # Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
+api_router = APIRouter()
 
 
 # Define Models
