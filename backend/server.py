@@ -9,7 +9,6 @@ from pydantic import BaseModel, Field
 from typing import List
 import uuid
 from datetime import datetime
-from transformers import pipeline, set_seed
 import random
 
 ROOT_DIR = Path(__file__).parent
@@ -44,32 +43,16 @@ except Exception as e:
     client = None
     mongo_connected = False
 
-# AI model WITH BETTER PROMPT ENGINEERING
-try:
-    print("⏳ Loading AI model (this may take a minute)...")
-    # Using distilgpt2 with better settings
-    story_generator = pipeline(
-        'text-generation', 
-        model='distilgpt2', 
-        device='cpu',
-        max_length=200,
-        truncation=True,
-        pad_token_id=50256  # GPT-2 pad token
-    )
-    set_seed(42)  # For reproducible results
-    print("✅ AI model loaded successfully!")
-    ai_model_loaded = True
-except Exception as e:
-    print(f"⚠️ AI model failed to load: {e}")
-    print("⚠️ Falling back to mock AI generator")
-    story_generator = None
-    ai_model_loaded = False
+# AI model - DISABLED for instant demo performance
+print("📚 Using rich mock story generator for instant folklore tales")
+story_generator = None
+ai_model_loaded = False  # This forces instant mock stories
 
 
 # Create the main app without a prefix
 app = FastAPI()
 
-# Create a router WITH /api PREFIX - FIXED LINE
+# Create a router WITH /api PREFIX
 api_router = APIRouter(prefix="/api")
 
 
@@ -134,119 +117,100 @@ async def get_status_checks():
         print(f"⚠️ Error fetching status checks: {e}")
         return []
 
-#  AI STORY GENERATION ENDPOINT WITH BETTER PROMPT ENGINEERING
+# RICH FOLKLORE STORY GENERATION ENDPOINT
 class StoryRequest(BaseModel):
     prompt: str
     max_length: int = 150
 
 @api_router.post("/generate", response_model=dict)
 async def generate_story(request: StoryRequest):
-    try:
-        if story_generator and ai_model_loaded:
-            # BETTER PROMPT ENGINEERING
-            print(f"🤖 Generating story for prompt: '{request.prompt}'")
-            
-            # Clean and format the prompt
-            clean_prompt = request.prompt[:80].strip()
-            
-            # Use a story-focused prompt template
-            story_prompts = [
-                f"Write a folklore story about {clean_prompt}:\n\n",
-                f"Here is a traditional tale about {clean_prompt}:\n\n",
-                f"In the old stories, they spoke of {clean_prompt}. This is one such tale:\n\n",
-                f"Long ago, in the time of legends, there was a story about {clean_prompt}:\n\n"
-            ]
-            
-            selected_prompt = random.choice(story_prompts)
-            
-            # Generate with better parameters
-            result = story_generator(
-                selected_prompt,
-                max_length=min(request.max_length + len(selected_prompt), 200),
-                num_return_sequences=1,
-                temperature=0.85,  # Balanced creativity
-                top_p=0.92,  # Nucleus sampling for better quality
-                do_sample=True,
-                repetition_penalty=1.2,  # Avoid repetition
-                pad_token_id=50256
-            )
-            
-            generated_text = result[0]['generated_text'].strip()
-            
-            # Clean up: Remove the prompt part if it's included
-            if generated_text.startswith(selected_prompt):
-                generated_text = generated_text[len(selected_prompt):].strip()
-            
-            # Further cleaning
-            generated_text = generated_text.split('\n')[0]  # Take first paragraph
-            if len(generated_text) < 20:  # If output too short, use mock
-                raise ValueError("AI output too short")
-            
-            return {
-                "generated_story": generated_text,
-                "ai_model_used": True,
-                "model": "distilgpt2 (prompt-engineered)",
-                "prompt_template": selected_prompt[:50] + "..."
-            }
-            
-    except Exception as e:
-        print(f"⚠️ AI generation failed: {e}")
-        # Fall through to mock stories
+    print(f"📖 Generating rich folklore story for: '{request.prompt}'")
     
-    # FALLBACK TO ENHANCED MOCK STORIES
-    print(f"📝 Using enhanced mock story for: '{request.prompt}'")
-    
-    # Enhanced story library with better prompts
-    enhanced_stories = {
+    # RICH FOLKLORE STORY LIBRARY
+    folklore_library = {
+        # Forest & Nature
         "forest": [
-            "Deep in the ancient forest, where sunlight dances through emerald leaves, there lived a spirit older than time. It whispered secrets of growth and patience to those who walked quietly.",
-            "The forest remembers every footprint. Its trees are libraries, their bark etched with tales of creatures who learned that true strength grows slowly, like rings in an oak."
+            "Deep in the ancient forest, where sunlight filters through emerald canopies, there lived the Woodsinger—a spirit who taught trees to whisper secrets to the wind. Those who listened learned that true growth happens in stillness.",
+            "The Emerald Grove remembered every creature's footfall. Its oldest oak, Barkeeper of Tales, stored stories in its rings. Squirrels delivered acorn-messages, and fireflies wrote poems in the dusk.",
+            "Where moss carpets stone and ferns unfurl like green scrolls, the forest taught patience. 'Watch how the sapling becomes the elder,' it murmured through rustling leaves. 'All things find their season.'"
         ],
+        
+        # Mountains & Peaks
         "mountain": [
-            "The mountains were sleeping giants who dreamed of touching the stars. Their dreams became the clouds, and their patience taught the valleys how to wait for spring.",
-            "High in the silent peaks, where eagles learn to fly, there is a story carved in stone about persistence - how even the tallest mountain began as a single grain of sand."
+            "The Stone Giants slept standing up, their dreams becoming clouds that watered valleys. They taught the eagles that true height is measured not in peaks reached, but in horizons seen.",
+            "High where air thins and stars feel close, the Mountain Keepers carved wisdom into cliffs. 'Every summit began as bedrock,' they whispered through avalanches. 'Greatness accumulates grain by grain.'",
+            "The Crystal Peaks hummed with ancient songs. Their glaciers moved like slow thoughts, polishing granite into mirrors that reflected both sky and the patient heart of stone."
         ],
+        
+        # Rivers & Water
         "river": [
-            "Every river remembers its first drop of rain. This one carried melodies from melting glaciers, singing them to stones that polished smooth as old memories.",
-            "The river's journey teaches flow without force. It learned songs from every bend, patience from every stone, becoming a flowing story of adaptation."
+            "River Silver-Tongue learned a different song from every bend—rushing choruses from rapids, lullabies from pools, clicking rhythms from stone-dancers. It became a flowing library of liquid melody.",
+            "The First River began as Sky's tear, gathering stories from melting glaciers. It taught pebbles to become smooth through gentle persistence, not force.",
+            "Watershapers believed every drop remembered its cloud. The river's journey mirrored life: sometimes rushing, sometimes still, always moving toward a greater sea of understanding."
         ],
-        "race": [
-            "A swift rabbit once challenged a steady turtle to a race. Confident in its speed, the rabbit paused to nap. But slow and determined, the turtle crossed the finish line as the rabbit slept, teaching all that consistency outpaces haste.",
-            "In the great race between speed and steadiness, the lesson was clear: quick bursts may impress, but enduring pace reaches further destinations."
-        ],
+        
+        # Animals & Fables
         "tortoise": [
-            "The wise tortoise knew that every journey begins with a single step. While others rushed ahead, it measured progress in sunrises, teaching that destinations matter less than the path.",
-            "Shell carrying home, the tortoise moved through life at nature's pace. It learned that true speed is measured not in distance covered, but in lessons gathered along the way."
+            "Shellback the Wise moved at Earth's heartbeat. While hare dashed in frenzied circles, Tortoise measured progress in sunrises. 'Destination matters less,' it said, 'than the wisdom gathered along the path.'",
+            "The Stone-Shell Elder carried home on its back, teaching that true wealth is what travels with you—patience in drought, perseverance in rain, peace in every pace.",
+            "Ancient Turtles of the Mudflats knew time differently. They measured years in algae-growth and epochs in sediment layers. 'Hurry is an illusion,' they murmured. 'All things arrive in their perfect moment.'"
         ],
+        
         "rabbit": [
-            "The quick rabbit learned that speed alone doesn't win races. Sometimes, the pause to appreciate flowers along the path teaches more than reaching the end first.",
-            "Full of energy but lacking patience, the rabbit discovered that swiftness needs wisdom's balance to truly succeed in life's long journey."
+            "Swiftpaw the Rabbit learned that speed without direction is mere motion. After losing the great race, it discovered that sometimes pausing to taste clover teaches more than winning.",
+            "The Moonhare danced in silver meadows, teaching that quickness should serve curiosity, not competition. Its ears tuned to Earth's subtlest vibrations—the sprout's push, the dew's descent.",
+            "Longears of the Bramble Patch moved like wind, but discovered that stillness held deeper magic. Listening between heartbeats, it heard the grass growing and understood slow wisdom."
+        ],
+        
+        "race": [
+            "In the Great Meadow Race, Swift Rabbit paused to nap in sun-patches while Steady Tortoise measured each deliberate step. At finish line, Rabbit learned: consistency outpaces bursts; endurance trumps haste.",
+            "The Legendary Race taught all creatures balance. Hare's speed needed Tortoise's patience to become true swiftness. Together they embodied the forest's rhythm—both dash and deliberate pace.",
+            "When Speed challenged Steadiness, the entire forest watched. Rabbit's quick leaps impressed, but Tortoise's unwavering progress reached further. The lesson echoed through generations: constancy wins marathon journeys."
+        ],
+        
+        # General Wisdom
+        "wisdom": [
+            "Elders of the Whispering Rock said: 'Knowledge flows like underground rivers—unseen but nourishing all it touches. Drink slowly from wisdom's spring.'",
+            "The Storyteller's Fire never died, fed by tales of ancestors. Each spark carried a lesson: how fire needs air, sun needs shadow, and every creature finds its essential rhythm.",
+            "In the Circle of Seasons, they understood that growth follows its own clock. Spring's urgency needs autumn's reflection; winter's stillness prepares summer's abundance."
+        ],
+        
+        "tree": [
+            "Grandfather Banyan's roots delved deep into memory, branches reaching for tomorrow. It taught that strength comes from both anchoring and reaching, from remembering and dreaming.",
+            "The Singing Willow bent with winds but never broke. Its leaves whispered: 'Flexibility is not weakness but intelligent strength—the reed survives storms that shatter oak.'",
+            "Memory-Oak stored centuries in concentric rings. Squirrels read its history like a living library. 'Each ring,' it said, 'is a year of rain and sun, of patience rewarded.'"
         ]
     }
     
-    prompt_lower = request.prompt.lower()
+    prompt_lower = request.prompt.lower().strip()
     
-    # Check for keywords with partial matching
-    for keyword, stories in enhanced_stories.items():
+    # Check for keyword matches
+    for keyword, stories in folklore_library.items():
         if keyword in prompt_lower:
+            selected_story = random.choice(stories)
             return {
-                "generated_story": random.choice(stories),
+                "generated_story": selected_story,
                 "ai_model_used": False,
-                "note": f"Enhanced mock story about {keyword}"
+                "theme": keyword,
+                "note": "Rich folklore story from curated library"
             }
     
-    # Creative default stories
+    # Creative defaults for unmatched prompts
     default_stories = [
-        "Long ago, when the world was young and magic flowed like morning mist, elders spoke of balance - how sun needs shadow, fire needs air, and every creature finds its pace.",
-        "The ancestors believed every challenge held hidden wisdom. They told tales not to entertain, but to plant seeds of understanding that would bloom when needed.",
-        "In the village of whispers, they understood that stories are bridges between generations. Each tale carried lessons wrapped in wonder, waiting for the right moment to unfold.",
-        "There is an old saying among storytellers: The fastest route isn't always straight, and the loudest voice isn't always right. True wisdom flows like underground rivers - unseen but essential."
+        "In the time before clocks, elders measured days by shadow-length and wisdom by listening-depth. They taught that stories are seeds—planted today, flowering when most needed.",
+        "The Keeper of Tales once said: 'Every ending whispers a beginning. Every challenge holds a gift wrapped in difficulty. True understanding arrives like dawn—gradually, then all at once.'",
+        "Where three rivers met, the Story-Stone absorbed their melodies. Travelers left tales like pebbles; the stone polished them smooth, returning wisdom worn comfortable by time's flow.",
+        "Ancient ones believed memory flowed in spirals, not lines. What was learned returns when needed, like migratory birds knowing unseen paths across vast skies.",
+        "The Weavers of Lore understood: some truths are too bright for direct sight. They wrap them in story-cloaks, so understanding arrives gently, like moonlight through leaves."
     ]
     
+    selected_story = random.choice(default_stories)
+    
     return {
-        "generated_story": random.choice(default_stories),
+        "generated_story": selected_story,
         "ai_model_used": False,
-        "note": "Creative folklore story"
+        "theme": "folklore wisdom",
+        "note": "Traditional wisdom story"
     }
     
 # Include the router in the main app
