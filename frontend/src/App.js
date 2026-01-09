@@ -22,8 +22,8 @@ import Contact from "./pages/Contact";
 
 import StoryGenerator from "./pages/StoryGenerator";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const BACKEND_URL = 'https://folkloregpt-production.up.railway.app';
+const API = BACKEND_URL; 
 
 function App() {
   const helloWorldApi = async () => {
