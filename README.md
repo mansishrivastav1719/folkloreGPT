@@ -62,3 +62,12 @@ Our big goal for the next round is to plug the AI storytelling engine into the d
 
 ![Database Schema](docs/database-schema.png)
 *MongoDB Stories collection schema*
+
+## 🌐 Live Deployment
+
+FolkloreGPT is deployed and fully functional with real AI story generation.
+
+### **Backend API (Live)**
+- **URL:** `https://folkloregpt-production.up.railway.app`
+- **Status:** ✅ **AI Model Enabled** (distilgpt2)
+- **Health Check:** `GET /api/` returns `{"message": "Hello World", "mongodb": true, "ai_model": true}`
