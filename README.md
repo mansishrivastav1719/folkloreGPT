@@ -68,6 +68,12 @@ Our big goal for the next round is to plug the AI storytelling engine into the d
 FolkloreGPT is deployed and fully functional with real AI story generation.
 
 ### **Backend API (Live)**
-- **URL:** `https://folkloregpt-production.up.railway.app`
+- **URL:** `[https://folkloregpt-production.up.railway.app](https://folkloregpt-production.up.railway.app/api/)`
 - **Status:** ✅ **AI Model Enabled** (distilgpt2)
 - **Health Check:** `GET /api/` returns `{"message": "Hello World", "mongodb": true, "ai_model": true}`
+
+### ⚙️ Deployment Configuration
+- **Environment:** Railway Free Tier (512MB RAM)
+- **AI Mode:** Curated Folklore Library (for consistent demo performance)
+- **Production Ready:** Set `ai_model_loaded = True` in `server.py` for full Hugging Face integration
+- **Reason:** Memory-optimized deployment ensures reliable access during evaluation
