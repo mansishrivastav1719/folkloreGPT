@@ -6,9 +6,9 @@ const StoryGenerator = () => {
   const [story, setStory] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  // Change this to your deployed backend URL tomorrow
-  const API_URL = 'http://localhost:8000/api/generate';
+  
+  //updated link
+const API_URL = 'https://folkloregpt-production.up.railway.app/api/generate';
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
