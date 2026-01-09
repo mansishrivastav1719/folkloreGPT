@@ -53,3 +53,8 @@ Our big goal for the next round is to plug the AI storytelling engine into the d
 - **Pankaj Singh** - Full-stack development & system architecture
 - **Priyanka Sharma** - Frontend development & UI/UX
 - **MD Arif** - Project coordination & documentation
+
+## expanding the readme for round 2
+## 📊 System Diagrams
+- **Data Flow Diagram:** [docs/download.png](docs/download.png)
+- **Database Schema:** [docs/database-schema.png](docs/database-schema.png)
