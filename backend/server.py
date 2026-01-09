@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 from typing import List
 import uuid
 from datetime import datetime
-# REMOVED: from transformers import pipeline
+from transformers import pipeline  # RE-ENABLED
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -43,9 +43,24 @@ except Exception as e:
     client = None
     mongo_connected = False
 
-# AI model DISABLED - Using mock
-print("✅ AI: Using mock generator (transformers disabled for stability)")
-story_generator = None
+# AI model WITH MEMORY OPTIMIZATION
+try:
+    print("⏳ Loading AI model (this may take a minute)...")
+    # Using distilgpt2 - smaller than regular GPT-2
+    story_generator = pipeline(
+        'text-generation', 
+        model='distilgpt2', 
+        device='cpu',  # Force CPU usage
+        max_length=100,  # Limit output length
+        truncation=True  # Prevent memory issues
+    )
+    print("✅ AI model loaded successfully!")
+    ai_model_loaded = True
+except Exception as e:
+    print(f"⚠️ AI model failed to load: {e}")
+    print("⚠️ Falling back to mock AI generator")
+    story_generator = None
+    ai_model_loaded = False
 
 
 # Create the main app without a prefix
@@ -67,7 +82,7 @@ class StatusCheckCreate(BaseModel):
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World", "mongodb": mongo_connected, "ai_model": False}
+    return {"message": "Hello World", "mongodb": mongo_connected, "ai_model": ai_model_loaded}
 
 @api_router.get("/test")
 async def test():
@@ -78,7 +93,7 @@ async def health():
     return {
         "status": "healthy",
         "mongodb": mongo_connected,
-        "ai_model": False,
+        "ai_model": ai_model_loaded,
         "timestamp": datetime.utcnow().isoformat()
     }
 
@@ -116,17 +131,72 @@ async def get_status_checks():
         print(f"⚠️ Error fetching status checks: {e}")
         return []
 
-#  AI STORY GENERATION ENDPOINT (MOCKED)
+#  AI STORY GENERATION ENDPOINT (NOW WITH REAL AI!)
 class StoryRequest(BaseModel):
     prompt: str
     max_length: int = 100
 
 @api_router.post("/generate", response_model=dict)
 async def generate_story(request: StoryRequest):
-    return {
-        "generated_story": f"Mock story for: '{request.prompt}'. The AI model is currently disabled for deployment stability.",
-        "note": "AI will be enabled after basic deployment is verified"
-    }
+    try:
+        if story_generator and ai_model_loaded:
+            # Generate story with AI
+            print(f"🤖 Generating story for prompt: '{request.prompt}'")
+            
+            # Limit prompt length to prevent memory issues
+            prompt = request.prompt[:100]  # First 100 chars only
+            
+            result = story_generator(
+                prompt,
+                max_length=min(request.max_length, 150),  # Max 150 tokens
+                num_return_sequences=1,
+                temperature=0.8,  # Creative but not random
+                do_sample=True
+            )
+            
+            generated_text = result[0]['generated_text'].strip()
+            
+            # Clean up the output
+            if generated_text.startswith(prompt):
+                generated_text = generated_text[len(prompt):].strip()
+            
+            return {
+                "generated_story": generated_text,
+                "ai_model_used": True,
+                "model": "distilgpt2"
+            }
+        else:
+            # Fallback to mock story
+            print(f"📝 Using mock story for prompt: '{request.prompt}'")
+            story_library = {
+                "mountain": "Long ago, the mountains were ancient giants who slept. They whispered secrets to the wind, which carried tales to the valleys below.",
+                "river": "The river's journey began as a single tear from the sky. It learned songs from every stone and creature it passed, becoming a flowing story.",
+                "forest": "The wise forest remembers every footstep. Its trees are libraries, their leaves holding stories that rustle in the dark.",
+                "animal": "In the old tales, animals could speak in human tongue, sharing wisdom from a time when the world was still being dreamed.",
+            }
+            
+            prompt_lower = request.prompt.lower()
+            for keyword, story in story_library.items():
+                if keyword in prompt_lower:
+                    return {
+                        "generated_story": story,
+                        "ai_model_used": False,
+                        "note": "Using mock story (AI model not loaded)"
+                    }
+            
+            return {
+                "generated_story": "In the beginning, the elders spoke of a time when stories grew on trees and laughter was a currency more valuable than gold.",
+                "ai_model_used": False,
+                "note": "Using default mock story (AI model not loaded)"
+            }
+            
+    except Exception as e:
+        print(f"⚠️ Error generating story: {e}")
+        return {
+            "generated_story": f"Error generating story: {str(e)[:100]}",
+            "ai_model_used": False,
+            "error": True
+        }
     
 # Include the router in the main app
 app.include_router(api_router)
