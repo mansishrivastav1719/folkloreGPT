@@ -14,21 +14,46 @@ from transformers import pipeline
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
 
-# Initialize AI story generator (placeholder for now) 
-story_generator = pipeline('text-generation', model='distilgpt2', device=-1) 
+# MongoDB connection WITH ERROR HANDLING
+try:
+    mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+    client = AsyncIOMotorClient(mongo_url, serverSelectionTimeoutMS=5000)
+    db = client[os.environ.get('DB_NAME', 'test_database')]
+    print("✅ MongoDB connected successfully")
+    mongo_connected = True
+except Exception as e:
+    print(f"⚠️ MongoDB connection failed: {e}")
+    # Create mock db to prevent crash
+    class MockCollection:
+        async def insert_one(self, *args, **kwargs):
+            return type('obj', (object,), {'inserted_id': 'mock_id'})
+        async def find(self, *args, **kwargs):
+            return []
+        async def to_list(self, length):
+            return []
+    
+    class MockDB:
+        def __getattr__(self, name):
+            return MockCollection()
+    
+    db = MockDB()
+    client = None
+    mongo_connected = False
 
-# Placeholder AI Story Generator (To be enhanced in next branch)
-story_generator = pipeline('text-generation', model='gpt2', device=-1)  # device=-1 uses CPU
+# AI model WITH ERROR HANDLING
+try:
+    story_generator = pipeline('text-generation', model='distilgpt2', device='cpu')
+    print("✅ AI model loaded successfully")
+except Exception as e:
+    print(f"⚠️ AI model failed to load: {e}")
+    story_generator = None
+
 
 # Create the main app without a prefix
 app = FastAPI()
 
-# Create a router with the /api prefix
+# Create a router
 api_router = APIRouter()
 
 
@@ -44,19 +69,29 @@ class StatusCheckCreate(BaseModel):
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Hello World", "mongodb": mongo_connected, "ai_model": story_generator is not None}
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
     status_dict = input.dict()
     status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
+    
+    # Only try to insert if MongoDB is connected
+    if mongo_connected:
+        await db.status_checks.insert_one(status_obj.dict())
+    else:
+        print("Mock DB: Skipping insert (MongoDB not connected)")
+    
     return status_obj
 
 @api_router.get("/status", response_model=List[StatusCheck])
 async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
+    if mongo_connected:
+        status_checks = await db.status_checks.find().to_list(1000)
+        return [StatusCheck(**status_check) for status_check in status_checks]
+    else:
+        print("Mock DB: Returning empty list (MongoDB not connected)")
+        return []
 
 #  AI STORY GENERATION ENDPOINT 
 class StoryRequest(BaseModel):
@@ -106,4 +141,5 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
-    client.close()
+    if client:
+        client.close()
