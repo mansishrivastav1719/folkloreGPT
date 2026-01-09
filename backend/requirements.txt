@@ -16,9 +16,9 @@ requests>=2.31.0
 pandas>=2.2.0
 python-multipart>=0.0.9
 jq>=1.6.0
-
-# AI packages - to install these separately
---index-url https://download.pytorch.org/whl/cpu
-torch>=2.0.0
 numpy>=1.26.0
+
+# Only these packages use PyTorch repo
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.0.0
 transformers>=4.36.0
