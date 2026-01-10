@@ -1,5 +1,4 @@
 # FolkloreGPT: AI-Powered Indigenous Storyteller
-## Phase 1: The Data Foundation
 
 **🎯 Hackathon Theme:** AI/ML (Natural Language Processing, Cultural Preservation)
 
