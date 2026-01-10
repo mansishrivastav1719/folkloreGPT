@@ -29,7 +29,7 @@ FolkloreGPT is deployed and fully functional with real AI story generation.
 
 [![FolkloreGPT Demo](https://img.youtube.com/vi/jGH_CkNQ0q4/0.jpg)](https://youtu.be/jGH_CkNQ0q4?si=EXV173vn4IOlqq-o)
 
-*Click the image above to watch our 3-minute demo showcasing all features*
+*Please click the image above to watch our 3-minute demo showcasing all features*
 
 
 # end of round 2 expansion 
