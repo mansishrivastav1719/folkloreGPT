@@ -87,6 +87,7 @@ This pipeline ensures clean separation between *data integrity* and *AI experime
 ### 📊 System Diagrams
 ![Data Flow Diagram](docs/download.png)
 *Diagram showing data flow through our system*
+
 This diagram illustrates FolkloreGPT’s dual-backend data flow, where Node.js handles reliable data input and media storage, while FastAPI manages AI inference and story generation. This separation ensures scalability, stability, and safe AI experimentation.
 
 
@@ -168,12 +169,13 @@ Memory-optimized deployment ensures reliable availability during evaluation.
 - Enabling multilingual story generation  
 - Containerizing the system with Docker for cloud deployment and autoscaling  
 
-> **Note:** Phases 1 and 2 are fully implemented and demonstrated, with Phase 3 representing planned post-hackathon enhancements.
+> **Note:** Phases 1 and 2 are fully implemented and demonstrated, while Phase 3 are post-hackathon planned enhancements.
 
 
 ### 🎥 Demo
 
 [![FolkloreGPT Demo](https://img.youtube.com/vi/jGH_CkNQ0q4/0.jpg)](https://youtu.be/jGH_CkNQ0q4?si=EXV173vn4IOlqq-o)
+
 *Please click the image above to watch our 3-minute demo showcasing the following features:* 
 - AI story generation  
 - Live API functionality  
