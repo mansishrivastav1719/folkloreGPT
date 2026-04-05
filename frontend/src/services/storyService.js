@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Use environment variable for data server URL, fallback to localhost for development
-const DATA_SERVER_URL = process.env.REACT_APP_DATA_SERVER_URL || 'http://localhost:5000';
+const DATA_SERVER_URL = process.env.REACT_APP_DATA_SERVER_URL || 'http://localhost:8000';
 const API_BASE_URL = `${DATA_SERVER_URL}/api`;
 
 class StoryService {
