@@ -18,6 +18,4 @@ Here's how our system works in practice:
 3.  **The Python FastAPI Server (`server.py`)** is set up as our main API hub. For now, it handles basic app requests, but we've deliberately built it to be the future home for our AI model. All the endpoints are structured so that adding the story generator later will be straightforward.
 4.  **Why two backends?** We separated them so our data collection is rock-solid and never goes down, even while we're testing or updating the AI part in the future. It just makes the whole system more stable.
 
-### 4. Prototype Demonstration
-For Round 1, we focused on solving the biggest problem first: **how do you reliably collect and store the complex folklore data an AI needs to learn?** Our prototype is a fully-working pipeline for this.
-[![Watch our FolkloreGPT Demo](https://youtu.be/)]
+
