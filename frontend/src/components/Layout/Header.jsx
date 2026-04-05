@@ -28,14 +28,15 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navigation = [
-    { name: 'Home', href: '/', icon: BookOpen },
-    { name: 'Stories', href: '/stories', icon: BookOpen },
-    { name: 'Listen', href: '/listen', icon: Headphones },
-    { name: 'Share Story', href: '/submit', icon: Mic },
-    { name: 'About', href: '/about', icon: Heart },
-    { name: 'Contact', href: '/contact', icon: Settings },
-  ];
+ const navigation = [
+  { name: 'Home', href: '/', icon: BookOpen },
+  { name: 'Stories', href: '/stories', icon: BookOpen },
+  { name: 'Listen', href: '/listen', icon: Headphones },
+  { name: 'AI Story', href: '/ai-story', icon: Sparkles },
+  { name: 'Share Story', href: '/submit', icon: Mic },
+  { name: 'About', href: '/about', icon: Heart },
+  { name: 'Contact', href: '/contact', icon: Settings },
+];
 
   const isActive = (path) => location.pathname === path;
 

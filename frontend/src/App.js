@@ -1,3 +1,4 @@
+import AIStory from "./pages/AIStory";
 import { useEffect } from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -41,7 +42,6 @@ function App() {
     <ErrorBoundary>
       <DataProvider>
         <div className="App min-h-screen relative overflow-x-hidden">
-          {/* Global background with fixed positioning */}
           <div className="fixed inset-0 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 -z-10"></div>
           
           <BrowserRouter>
@@ -57,6 +57,7 @@ function App() {
                   <Route path="/about" element={<About />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/contact" element={<Contact />} />
+                  <Route path="/ai-story" element={<AIStory />} />
                 </Routes>
               </main>
               <Footer />
